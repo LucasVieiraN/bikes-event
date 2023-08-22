@@ -5,8 +5,8 @@ export class CreateUserDto {
   name: string
 
   @IsString()
-  @MinLength(11, { message: 'The CPF can only contain 11 digits.' })
-  @MaxLength(11, { message: 'The CPF can only contain 11 digits.' })
+  @MinLength(11, { message: 'The CPF can contain at least 11 digits without periods and hyphens.' })
+  @MaxLength(14, { message: 'The CPF can contain a maximum of 14 digits with periods and hyphens.' })
   cpf: string
 
   @IsString()

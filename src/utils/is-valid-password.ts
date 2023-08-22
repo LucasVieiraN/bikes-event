@@ -1,4 +1,4 @@
-import { ErrorException } from "src/errors/exceptions";
+import { ErrorException } from "../errors/exceptions";
 
 export function isValidPassword(password: string) {
   const regexForOneNumberOneUpperCaseAndSixCharacters = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/

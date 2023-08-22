@@ -7,6 +7,7 @@ import { PrismaService } from '../../database/prisma.service';
 import { ErrorException } from '../../errors/exceptions';
 import { isValidPassword } from '../../utils/is-valid-password';
 import { hashPassword } from '../../utils/hash-password'
+import { validateAndFormatCPF } from '../../utils/validate-and-format-cpf';
 
 @Injectable()
 export class UsersService {
@@ -26,8 +27,9 @@ export class UsersService {
 
     isValidPassword(password)
     const hashedPassword = await hashPassword(password)
+    const cpfValidatedAndFormated = validateAndFormatCPF(cpf)
 
-    await this.prisma.users.create({ data: { cpf, email, name, password: hashedPassword } })
+    await this.prisma.users.create({ data: { cpf: cpfValidatedAndFormated, email, name, password: hashedPassword } })
   }
 
   async findAllUsers(): Promise<User[]> {
