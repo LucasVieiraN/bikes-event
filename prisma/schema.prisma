@@ -22,13 +22,26 @@ model Events {
 }
 
 model Users {
-  id       String  @id @unique @default(uuid())
-  user_id  String?
+  id       String   @id @unique @default(uuid())
+  event_id String?
   name     String
-  cpf      String  @unique
-  email    String  @unique
+  cpf      String   @unique
+  email    String   @unique
   password String
-  event    Events? @relation(fields: [user_id], references: [id])
+  event    Events?  @relation(fields: [event_id], references: [id])
+  Tokens   Tokens[]
 
   @@map("users")
+}
+
+model Tokens {
+  id           String   @unique @default(uuid())
+  accessToken  String   @unique
+  refreshToken String   @unique
+  userId       String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  Users        Users?   @relation(fields: [userId], references: [id])
+
+  @@map("tokens")
 }
