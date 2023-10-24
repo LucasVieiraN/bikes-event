@@ -5,7 +5,7 @@ import { format } from 'date-fns-tz'
 
 import { TokensRepository } from '../repository/tokens.repository';
 import { UsersRepository } from '../../users/repository/users.repository';
-import { tokenExpirationDay } from '../../../utils/expires-date';
+import { tokenExpirationDate } from '../../../utils/token-expiration-date';
 
 @Injectable()
 export class TokensService {
@@ -30,7 +30,7 @@ export class TokensService {
     ]);
 
 
-    const { expiresAt } = await this.tokensRepository.create({ accessToken, refreshToken, userId, expiresDate: tokenExpirationDay(process.env.REFRESH_TOKEN_EXPIRES_IN) })
+    const { expiresAt } = await this.tokensRepository.create({ accessToken, refreshToken, userId, expiresDate: tokenExpirationDate(process.env.REFRESH_TOKEN_EXPIRES_IN) })
 
     const formatDate = format(expiresAt, 'dd/MM/yyyy HH:mm:ss', { timeZone: 'America/Recife' })
 
