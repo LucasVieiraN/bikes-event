@@ -5,6 +5,7 @@ import { SignUpRepository } from '../repository/sign-up.repository';
 import { UsersRepository } from '../../../modules/users/repository/users.repository';
 import { validateAndFormatCPF } from '../../../utils/validate-and-format-cpf';
 import { hashPassword } from '../../../utils/hash-password';
+import { isPasswordValid } from '../../../utils/is-password-valid';
 
 @Injectable()
 export class SignUpService {
@@ -12,6 +13,7 @@ export class SignUpService {
 
   async signUp({ cpf, email, name, password }: CreateAccountDto) {
     const cpfValidatedAndFormated = validateAndFormatCPF(cpf)
+    isPasswordValid(password)
     const hashedPassword = await hashPassword(password)
     const findUserByCPF = await this.usersRepository.findByCPF(cpfValidatedAndFormated)
     const findUserByEmail = await this.usersRepository.findByEmail(email)
