@@ -38,7 +38,10 @@ export class TokensService {
   }
 
   async createAccessToken(userId: string) {
-    const createdAccessToken = await this.jwtService.signAsync({ userId }, { secret: process.env.ACCESS_TOKEN_SECRET, expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN })
+    const createdAccessToken = await this.jwtService.signAsync({ userId },
+      {
+        secret: process.env.ACCESS_TOKEN_SECRET, expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN
+      })
 
     return createdAccessToken
   }
@@ -50,7 +53,8 @@ export class TokensService {
       throw new HttpException('Token not found!', 404)
     }
 
-    const expiresTokenOrError = await this.jwtService.verifyAsync(token.refreshToken, { secret: process.env.REFRESH_TOKEN_SECRET }).catch((e) => { return e })
+    const expiresTokenOrError = await this.jwtService.verifyAsync(token.refreshToken, { secret: process.env.REFRESH_TOKEN_SECRET })
+      .catch((e) => { return e })
 
     if (expiresTokenOrError.message === 'jwt expired') {
       await this.tokensRepository.delete(token.userId)
@@ -58,7 +62,7 @@ export class TokensService {
     }
 
     const newAccessToken = await this.createAccessToken(token.userId)
-    await this.tokensRepository.updateAccessToken(token.userId, token.accessToken)
+    await this.tokensRepository.updateAccessToken(token.userId, newAccessToken)
 
     return { accessToken: newAccessToken }
   }
