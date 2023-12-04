@@ -1,43 +1,29 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { format } from 'date-fns-tz'
-
 import { TokensRepository } from '../repository/tokens.repository';
 import { UsersRepository } from '../../users/repository/users.repository';
-import { tokenExpirationDate } from '../../../utils/token-expiration-date';
+import { CreateAuthTokensDtoInput, CreateAuthTokensDtoOutput } from '../dto/create-auth-tokens.dto';
 
 @Injectable()
 export class TokensService {
   constructor(private readonly jwtService: JwtService, private readonly tokensRepository: TokensRepository, private readonly usersRepository: UsersRepository) {}
 
-  async createTokens(userId: string) {
-    const user = await this.usersRepository.findUserById(userId)
-
-    if (!user) {
-      throw new HttpException('User not found!', 404)
-    }
-
-    const foundToken = await this.tokensRepository.findById(user.id)
-
-    if (foundToken) {
-      await this.tokensRepository.delete(user.id)
-    }
-
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync({ userId }, { secret: process.env.ACCESS_TOKEN_SECRET, expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN }),
-      this.jwtService.signAsync({ userId }, { secret: process.env.REFRESH_TOKEN_SECRET, expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN },),
-    ]);
-
-
-    const { expiresAt } = await this.tokensRepository.create({ accessToken, refreshToken, userId, expiresDate: tokenExpirationDate(process.env.REFRESH_TOKEN_EXPIRES_IN) })
-
-    const formatDate = format(expiresAt, 'dd/MM/yyyy HH:mm:ss', { timeZone: 'America/Recife' })
-
-    return { expiresDate: formatDate, tokens: { accessToken, refreshToken } }
+  async createTokens({ accessToken, refreshToken, expiresDate, userId }: CreateAuthTokensDtoInput): Promise<CreateAuthTokensDtoOutput> {
+    return this.tokensRepository.create({ accessToken, refreshToken, expiresDate, userId })
   }
 
-  async createAccessToken(userId: string) {
+  async findTokenAndDelete(userId: string): Promise<void | null> {
+    const foundToken = await this.tokensRepository.findById(userId)
+
+    if (foundToken) {
+      return this.tokensRepository.delete(foundToken.userId)
+    }
+
+    return null
+  }
+
+  async createAccessToken(userId: string): Promise<string> {
     const createdAccessToken = await this.jwtService.signAsync({ userId },
       {
         secret: process.env.ACCESS_TOKEN_SECRET, expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN
@@ -46,7 +32,7 @@ export class TokensService {
     return createdAccessToken
   }
 
-  async verifyExpiresRefreshTokenOrCreateNewAccessToken(refreshToken: string) {
+  async verifyExpiresRefreshTokenOrCreateNewAccessToken(refreshToken: string): Promise<{ accessToken: string }> {
     const token = await this.tokensRepository.findByRefreshToken(refreshToken)
 
     if (!token) {

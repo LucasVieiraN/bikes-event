@@ -1,20 +1,10 @@
-import { Controller, Post, Body, HttpException, Headers, HttpCode } from '@nestjs/common';
+import { Controller, Post, HttpException, Headers, HttpCode } from '@nestjs/common';
 
 import { TokensService } from '../service/tokens.service';
 
 @Controller('sessions')
 export class TokensController {
   constructor(private readonly tokensService: TokensService) {}
-
-  @Post()
-  @HttpCode(201)
-  async createTokensHandler(@Body() payload: { userId: string }) {
-    try {
-      return this.tokensService.createTokens(payload.userId)
-    } catch (e) {
-      throw new HttpException(e.message, e.status)
-    }
-  }
 
   @Post('refreshToken')
   @HttpCode(201)
