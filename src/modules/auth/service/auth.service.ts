@@ -3,11 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { compare } from 'bcryptjs';
 import { format } from 'date-fns-tz'
 
-import { CreateAccountDto } from './dto/create-account.dto';
-import { TokensService } from '../tokens/service/tokens.service'
-import { UsersService } from '../users/service/users.service';
-import { tokenExpirationDate } from '../../utils/token-expiration-date';
-import { createJwt } from '../../utils/create-jwt-tokens';
+import { CreateAccountDto } from '../dto/create-account.dto';
+import { TokensService } from '../../tokens/service/tokens.service'
+import { UsersService } from '../../users/service/users.service';
+import { tokenExpirationDate } from '../../../utils/token-expiration-date';
+import { createJwt } from '../../../utils/create-jwt-tokens';
 
 @Injectable()
 export class AuthService {
