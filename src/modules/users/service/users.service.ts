@@ -1,11 +1,9 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { Prisma, Users } from '@prisma/client';
 
 import { User } from '../entities/user.entity';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { FindUsersOutput } from '../dto/find-users-output';
 import { UsersRepository } from '../repository/users.repository';
-import { PrismaService } from '../../../database/prisma.service';
 import { CreateAccountDto } from '../../../modules/auth/dto/create-account.dto';
 import { validateAndFormatCPF } from '../../../utils/validate-and-format-cpf';
 import { isPasswordValid } from '../../../utils/is-password-valid';
@@ -13,7 +11,7 @@ import { hashPassword } from '../../../utils/hash-password';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService, private readonly usersRepository: UsersRepository) {}
+  constructor(private readonly usersRepository: UsersRepository) {}
 
   async create({ cpf, email, name, password }: CreateAccountDto): Promise<User> {
     const cpfValidatedAndFormated = validateAndFormatCPF(cpf)
@@ -57,7 +55,7 @@ export class UsersService {
     return user
   }
 
-  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<Users> {
+  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const userUpdated = await this.usersRepository.updateUser(id, updateUserDto).catch(e => { return e })
 
     if (userUpdated.code === 'P2025') {
