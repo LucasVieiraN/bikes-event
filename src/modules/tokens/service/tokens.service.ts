@@ -2,12 +2,11 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { TokensRepository } from '../repository/tokens.repository';
-import { UsersRepository } from '../../users/repository/users.repository';
 import { CreateAuthTokensDtoInput, CreateAuthTokensDtoOutput } from '../dto/create-auth-tokens.dto';
 
 @Injectable()
 export class TokensService {
-  constructor(private readonly jwtService: JwtService, private readonly tokensRepository: TokensRepository, private readonly usersRepository: UsersRepository) {}
+  constructor(private readonly jwtService: JwtService, private readonly tokensRepository: TokensRepository) {}
 
   async createTokens({ accessToken, refreshToken, expiresDate, userId }: CreateAuthTokensDtoInput): Promise<CreateAuthTokensDtoOutput> {
     return this.tokensRepository.create({ accessToken, refreshToken, expiresDate, userId })
