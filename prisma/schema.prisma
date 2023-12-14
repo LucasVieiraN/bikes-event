@@ -17,6 +17,7 @@ model Events {
   start_place             String
   participants_limit      Int
   users                   Users[]
+  event_creator           String
 
   @@map("events")
 }
